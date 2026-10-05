@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10131b" />
+    <meta
+      name="description"
+      content="Explore sorting algorithms with a hands-on visualizer."
+    />
+    <title>Algorithm Arena — Sorting Visualizer</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Algorithm Arena home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="brand-copy">
+            <h1 class="brand-title">Algorithm Arena</h1>
+            <span class="brand-subtitle">Visualise how sorting algorithms work.</span>
+          </span>
+        </a>
+        <span class="topbar-note"><span class="live-dot"></span> SORTING VISUALIZER</span>
+      </header>
+
+      <section class="visualizer-card" id="top" aria-label="Sorting visualizer">
+        <div class="controls">
+          <div class="control-group algorithm-control">
+            <label for="algorithm">Algorithm</label>
+            <div class="select-wrap">
+              <select id="algorithm" name="algorithm">
+                <option value="quick">Quick sort</option>
+                <option value="merge">Merge sort</option>
+                <option value="insertion">Insertion sort</option>
+                <option value="selection">Selection sort</option>
+                <option value="bubble">Bubble sort</option>
+              </select>
+              <span class="select-chevron" aria-hidden="true">⌄</span>
+            </div>
+          </div>
+
+          <div class="control-group slider-control">
+            <div class="label-row">
+              <label for="array-size">Array size</label>
+              <output id="size-value" for="array-size">36</output>
+            </div>
+            <input id="array-size" type="range" min="12" max="80" value="36" />
+          </div>
+
+          <div class="control-group slider-control speed-control">
+            <div class="label-row">
+              <label for="speed">Speed</label>
+              <output id="speed-value" for="speed">1.0×</output>
+            </div>
+            <input id="speed" type="range" min="1" max="5" value="2" />
+          </div>
+
+          <div class="actions">
+            <button class="button button-quiet" id="generate-button" type="button">
+              <span class="button-icon" aria-hidden="true">⟳</span> Generate Array
+            </button>
+            <button class="button button-primary" id="sort-button" type="button">
+              <span class="play-icon" aria-hidden="true">▶</span> Start Sorting
+            </button>
+            <button class="button button-stop" id="stop-button" type="button" disabled>
+              <span class="stop-icon" aria-hidden="true">■</span> Stop
+            </button>
+            <button class="button button-quiet reset-button" id="reset-button" type="button">
+              <span class="button-icon" aria-hidden="true">↺</span> Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="chart-heading">
+          <div>
+            <h2>Array visualization</h2>
+          <p>Watch each value find its place.</p>
+          </div>
+          <div class="legend" aria-label="Visualization legend">
+            <span><i class="legend-bar legend-default"></i>Unsorted</span>
+            <span><i class="legend-bar legend-active"></i>Comparing</span>
+            <span><i class="legend-bar legend-complete"></i>Sorted</span>
+          </div>
+        </div>
+
+        <div class="chart" id="chart" role="img" aria-label="Unsorted array visualization">
+          <div class="bars" id="bars" aria-hidden="true"></div>
+          <div class="chart-baseline" aria-hidden="true"></div>
+        </div>
+
+        <div class="statusbar" aria-live="polite" aria-atomic="true">
+          <div class="status-message">
+            <span class="status-indicator" id="status-indicator"></span>
+            <span id="status-text">Ready</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Sorting statistics">
+        <article class="metric-card">
+          <span class="metric-icon icon-compare" aria-hidden="true">⇄</span>
+          <div><p>Comparisons</p><strong id="comparison-count">0</strong></div>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon icon-swaps" aria-hidden="true">↕</span>
+          <div><p>Swaps</p><strong id="swap-count">0</strong></div>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon icon-size" aria-hidden="true">▥</span>
+          <div><p>Array size</p><strong id="array-count">36</strong></div>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon icon-time" aria-hidden="true">◷</span>
+          <div><p>Sorting time</p><strong id="sort-time">0.00 s</strong></div>
+        </article>
+      </section>
+
+      <section class="complexity-card" aria-labelledby="complexity-title">
+        <div class="complexity-heading">
+          <div>
+            <p class="section-kicker">AT A GLANCE</p>
+            <h2 id="complexity-title">Time complexity</h2>
+          </div>
+          <span class="complexity-algorithm" id="complexity-name">Quick sort</span>
+        </div>
+        <div class="complexity-grid">
+          <div class="complexity-item"><span>Best case</span><strong id="complexity-best">O(n log n)</strong></div>
+          <div class="complexity-item"><span>Average case</span><strong id="complexity-average">O(n log n)</strong></div>
+          <div class="complexity-item"><span>Worst case</span><strong id="complexity-worst">O(n²)</strong></div>
+          <div class="complexity-item"><span>Space</span><strong id="complexity-space">O(log n)</strong></div>
+        </div>
+      </section>
+
+      <section class="race-card" aria-labelledby="race-title">
+        <div class="race-topline">
+          <div class="race-intro">
+            <p class="section-kicker">HEAD TO HEAD</p>
+            <h2 id="race-title">Algorithm race</h2>
+            <p>Same array, two copies. See who gets to the finish first.</p>
+          </div>
+          <div class="race-controls">
+            <div class="control-group">
+              <label for="race-algorithm-a">Algorithm A</label>
+              <div class="select-wrap">
+                <select id="race-algorithm-a" name="race-algorithm-a">
+                  <option value="bubble">Bubble sort</option>
+                  <option value="selection">Selection sort</option>
+                  <option value="insertion">Insertion sort</option>
+                  <option value="quick">Quick sort</option>
+                  <option value="merge">Merge sort</option>
+                </select>
+                <span class="select-chevron" aria-hidden="true">⌄</span>
+              </div>
+            </div>
+            <span class="race-versus" aria-hidden="true">VS</span>
+            <div class="control-group">
+              <label for="race-algorithm-b">Algorithm B</label>
+              <div class="select-wrap">
+                <select id="race-algorithm-b" name="race-algorithm-b">
+                  <option value="bubble">Bubble sort</option>
+                  <option value="selection">Selection sort</option>
+                  <option value="insertion">Insertion sort</option>
+                  <option value="quick" selected>Quick sort</option>
+                  <option value="merge">Merge sort</option>
+                </select>
+                <span class="select-chevron" aria-hidden="true">⌄</span>
+              </div>
+            </div>
+            <button class="button button-primary race-button" id="race-button" type="button">
+              <span class="play-icon" aria-hidden="true">▶</span> Race
+            </button>
+          </div>
+        </div>
+
+        <div class="race-winner" id="race-winner" role="status" hidden>
+          <span class="winner-spark" aria-hidden="true">✦</span>
+          <span id="race-winner-text"></span>
+        </div>
+
+        <div class="race-grid">
+          <article class="race-lane" aria-labelledby="race-name-a">
+            <div class="race-lane-heading">
+              <div class="race-lane-title">
+                <span class="race-badge badge-a">A</span>
+                <h3 id="race-name-a">Bubble sort</h3>
+              </div>
+              <span class="race-lane-status" id="race-status-a">Ready</span>
+            </div>
+            <div class="race-chart" id="race-chart-a" role="img" aria-label="Algorithm A array visualization">
+              <div class="race-bars" id="race-bars-a" aria-hidden="true"></div>
+              <div class="race-baseline" aria-hidden="true"></div>
+            </div>
+            <div class="race-stats">
+              <div><span>Comparisons</span><strong id="race-comparisons-a">0</strong></div>
+              <div><span>Swaps</span><strong id="race-swaps-a">0</strong></div>
+              <div><span>Time</span><strong id="race-time-a">—</strong></div>
+            </div>
+          </article>
+
+          <article class="race-lane" aria-labelledby="race-name-b">
+            <div class="race-lane-heading">
+              <div class="race-lane-title">
+                <span class="race-badge badge-b">B</span>
+                <h3 id="race-name-b">Quick sort</h3>
+              </div>
+              <span class="race-lane-status" id="race-status-b">Ready</span>
+            </div>
+            <div class="race-chart" id="race-chart-b" role="img" aria-label="Algorithm B array visualization">
+              <div class="race-bars" id="race-bars-b" aria-hidden="true"></div>
+              <div class="race-baseline" aria-hidden="true"></div>
+            </div>
+            <div class="race-stats">
+              <div><span>Comparisons</span><strong id="race-comparisons-b">0</strong></div>
+              <div><span>Swaps</span><strong id="race-swaps-b">0</strong></div>
+              <div><span>Time</span><strong id="race-time-b">—</strong></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>Built for curious minds.</span>
+        <span class="footer-key">A little order, one step at a time <span aria-hidden="true">✳</span></span>
+      </footer>
+    </main>
+  </body>
+</html>
